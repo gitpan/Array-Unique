@@ -3,112 +3,110 @@ package Array::Unique;
 use 5.006;
 use strict;
 #use warnings;
+use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use Tie::Array;
-use base qw(Tie::StdArray);
+sub TIEARRAY  { 
+    my $class = shift;
+    my $mode = shift;
 
-#sub TIEARRAY  { bless [], $_[0] }
-#sub FETCHSIZE { scalar @{$_[0]} }
-#sub STORESIZE { $#{$_[0]} = $_[1]-1 }
-#####sub STORE     { $_[0]->[$_[1]] = $_[2] }
-#sub FETCH     { $_[0]->[$_[1]] }
-#sub CLEAR     { @{$_[0]} = () }
-#sub POP       { pop(@{$_[0]}) }
-#####sub PUSH      { my $o = shift; push(@$o,@_) }
-#sub SHIFT     { shift(@{$_[0]}) }
-#sub UNSHIFT   { my $o = shift; unshift(@$o,@_) }
-#sub EXISTS    { exists $_[0]->[$_[1]] }
-#sub DELETE    { delete $_[0]->[$_[1]] }
-#sub SPLICE
-#sub EXTEND
-#sub DESTROY
 
-sub clean {
-    my $self = shift;
+    my $self;
 
-#    print "DEBUG: '@$self'\n";
-    #print "DEBUG2: '@$self'\n";
-    my @temp;
-    foreach my $v (@$self) {
-	next unless (defined $v);
-	unless (grep {$v eq $_} @temp) {
-	    push @temp, $v;
-	}
+    $mode = 'Std' unless (defined $mode);
+    
+    if ($mode eq "IxHash") {
+	$self = bless [], $class;
+
+	require Array::Unique::IxHash;
+ 	our @ISA;
+	#unshift @ISA, "Array::Unique::IxHash";
+	@ISA = ("Array::Unique::IxHash");
+	#print "DEBUG: @ISA\n";
+	# using unshift instead of shift because I had problems
+	# with the test code that the previous ISA was not cleaned
+	# so I used the same mode for all the test.
+	# This is an open issue what to do with the @ISA so only
+	# the current instance of the module should get it and not
+	# the futuer instances.
     }
-    @$self = @temp;
+    
+    if ($mode eq 'Std') {
+	$self = bless [], $class;
 
+	require Array::Unique::Std;
+ 	our @ISA;
+	#unshift @ISA, "Array::Unique::Std";
+	@ISA = ("Array::Unique::Std");
+	#print "DEBUG: @ISA\n";
+    }
+
+    if (defined $self) {
+	$self->_init;
+	return $self;
+    } else {
+	carp("Invalid mode: '$mode'");
+	return undef;
+    }
 }
-
-
-sub STORE {
-    my $self = shift;
-#    print "STORE PARAM: @_\n";
-
-    $self->SUPER::STORE(@_);
-
-    $self->clean;
-
-#    my $index = shift;
-#    my $value = shift;
-
-#    print "STORE: @$self\n";
-#    unless (scalar grep {$value eq $_} @$self) {
-#	$self->[$index]=$value;
-#    }
-#    foreach my $v (@$self) {
-#	return if ($v eq $value);
-#    }
-#    $self->[$index]=$value;
-}
-
-sub PUSH {
-    my $self = shift;
-
-    $self->SUPER::PUSH(@_);
-    $self->clean;
-
-#    $self->STORE($self->FETCHSIZE, shift) while (@_);
-}
-
-
-sub UNSHIFT {
-    my $self = shift;
-
-    $self->SUPER::UNSHIFT(@_);
-    $self->clean;
-
-}
-
-sub SPlICE {
-    my $self = shift;
-
-    $self->SUPER::SPlICE(@_);
-    $self->clean;
-}
-
 
 1;
 __END__
 
 =head1 NAME
 
-Array::Unique - Arrays that allow only unique values
+Array::Unique - Tieable array that allows only unique values
 
 =head1 SYNOPSIS
 
  use Array::Unique;
  tie @a, Array::Unique;
+ or
+ tie @a, Array::Unique, 'Std';
+ or
+ tie @a, Array::Unique, 'IxHash';
 
  Use @a as a regular arrray.
 
 =head1 DESCRIPTION
 
- There is not much to say here.
- The module provides you with a tie-able array
- that allows only unique values.
- It does not allow undef as a value in the array.
+ This package supplies two different implementation of
+ the Unique Array tie construct.
+
+ In both cases you tie a regular array to this class and
+ use your array as you did earlier but now if try to add
+ a value to the array in any way ($a[3]='s'; or push or 
+ unshift or splice) which value was already an element 
+ of the array the array will discard one of the copies.
+
+ By this you have an array where the values are unique.
+
+ Uniqueness is checeked with the 'eq' operator so 
+ among other things it is case sensitive.
+
+ The two implementations are:
+ Std    - the Standard version and the
+          Array::Unique::Std
+ IxHash - a version using the Tie::IxHash module of
+          Gurusamy Sarathy
+          Array::Unique::IxHash;
+
+ You can select which implementation you would like to
+ use by providing its name in the tie construct.
+ The default currently is the Standard implementation.
+
+ The main differences between the two implementations
+ are speed and memory usage. 
+ The Standard version uses about the same amount of space 
+ as a regular array but adding new values takes O(n) time 
+ so filling in an originally empty array will take O(n^2) time.
+
+ The IxHash implementation requires installing Tie::IxHash
+ uses about 4 times more space than a regular array but
+ it is should be faster than the the Standard implementation.
+
+ The module does not allow undef as a value in the array.
 
 =head1 DISCUSSION
 
@@ -175,6 +173,13 @@ Array::Unique - Arrays that allow only unique values
 
 =back
 
+=head1 BUGS
+
+ I think you cannot use two different implementations
+ in the same script.
+
+ Cannot use negative indexes in Splice (?)
+
 =head1 TODO
 
  Benchmark speed
@@ -186,22 +191,41 @@ Array::Unique - Arrays that allow only unique values
 
  Enable optional compare with other functions
 
- Setup other implementations
+ Write even better implementations.
 
 =head1 AUTHOR
 
  Gabor Szabo <gabor@perl.org.il>
 
-=head1 COPYRIGHT AND LICENCE
-
  Copyright (C) 2002 Gabor Szabo <gabor@perl.org.il>
  All rights reserved.
-
 
  You may distribute under the terms of either the GNU 
  General Public License or the Artistic License, as 
  specified in the Perl README file.
 
  No WARRANTY whatsoever.
+
+=head1 SUPPORT
+
+ There is no official support for this package but
+ you can send bug reports directly to the author.
+
+ To get other support answers you should use either
+ the Hungarian Perl mailing list at perl@atom.hu
+ if you want to ask in Hungarian or the Israeli Perl 
+ mailing list at http://www.perl.org.il/ in English.
+
+=head1 CREDITS
+
+ Thanks for suggestions and bug reports to 
+ Szabo Balazs (dLux)
+ Shlomo Yona
+ Gaal Yahas
+
+=head1 VERSION
+
+ Version: 0.02      
+ Date:    2002.07.26
 
 =cut

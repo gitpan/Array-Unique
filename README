@@ -1,7 +1,9 @@
-Array/Unique version 0.01
+Array/Unique version 0.02
 =========================
 
-
+The module provides you with a tie-able array
+that allows only unique values.
+It does not allow undef as a value in the array.
 
 INSTALLATION
 

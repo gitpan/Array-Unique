@@ -2,5 +2,8 @@ Changes
 Makefile.PL
 MANIFEST
 README
-test.pl
+t/default.t
 Unique.pm
+Unique/Std.pm
+Unique/IxHash.pm
+
