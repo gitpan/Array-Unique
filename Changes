@@ -1,5 +1,19 @@
 Revision history for Perl extension Array::Unique.
 
+0.05  2003 October 11
+
+0.04  2002 December   - never released
+      added use warnings to the released version as well.
+      add tests with negative indexes and fix a minor problem
+      with negative indexes in splice.
+
+      Add '' in documentation to satisfy strict and warnings
+      Change tests to use Test::More and add Test::More requirement
+	     to the makefile.
+
+      Creat a new implementation from scratch that will replace all
+      previous implementations. 
+
 0.03  2002 July 27
       Nothing changed inside.
       Added Tie::IxHash as a prequisite to the Makefile.PL file.

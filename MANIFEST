@@ -2,8 +2,9 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/default.t
+t/01regular.t
+t/02class.t
+t/03unique.t
 Unique.pm
-Unique/Std.pm
-Unique/IxHash.pm
 
+META.yml                                Module meta-data (added by MakeMaker)

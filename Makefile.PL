@@ -3,9 +3,9 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'		=> 'Array::Unique',
-    'VERSION_FROM'	=> 'Unique.pm', # finds $VERSION
-    'PREREQ_PM'		=> {'Tie::IxHash' => '1.21'},
-    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM => 'Unique.pm', # retrieve abstract from module
+    'VERSION_FROM'	=> 'Unique.pm',
+    'PREREQ_PM'		=> {'Tie::IxHash' => '1.21', Test::More => '0.47'},
+    ($] >= 5.006 ?    
+      (ABSTRACT_FROM => 'Unique.pm', 
        AUTHOR     => 'Gabor Szabo <gabor@tracert.com>') : ()),
 );
