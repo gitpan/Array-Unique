@@ -1,5 +1,9 @@
 Revision history for Perl extension Array::Unique.
 
+0.03  2002 July 27
+      Nothing changed inside.
+      Added Tie::IxHash as a prequisite to the Makefile.PL file.
+
 0.02  2002 July 26
       Fix a typo in SPLICE that caused it not working at all.
       Add a test that would have caught this bug.

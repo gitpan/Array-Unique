@@ -5,7 +5,7 @@ use strict;
 #use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub TIEARRAY  { 
     my $class = shift;
@@ -42,6 +42,14 @@ sub TIEARRAY  {
 	#print "DEBUG: @ISA\n";
     }
 
+#    if ($mode eq 'Quick') {
+#	$self = bless {}, $class;
+#	require Array::Unique::Quick;
+# 	our @ISA;
+#	@ISA = ("Array::Unique::Quick");
+#    }
+
+
     if (defined $self) {
 	$self->_init;
 	return $self;
@@ -53,6 +61,7 @@ sub TIEARRAY  {
 
 1;
 __END__
+=pod
 
 =head1 NAME
 
@@ -107,6 +116,15 @@ Array::Unique - Tieable array that allows only unique values
  it is should be faster than the the Standard implementation.
 
  The module does not allow undef as a value in the array.
+
+=head1 EXAMPLES
+
+ use Array::Unique;
+ tie @a, Array::Unique;
+
+ @a = qw(a b c a d e f);
+ push @a, qw(x b z);
+ print "@a\n";          # a b c d e f x z
 
 =head1 DISCUSSION
 
@@ -225,7 +243,7 @@ Array::Unique - Tieable array that allows only unique values
 
 =head1 VERSION
 
- Version: 0.02      
- Date:    2002.07.26
+ Version: 0.03      
+ Date:    2002.07.27
 
 =cut
