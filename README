@@ -1,0 +1,29 @@
+Array/Unique version 0.01
+=========================
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ Perl 5
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Gabor Szabo <gabor@perl.org.il>
+All rights reserved.
+
+
+You may distribute under the terms of either the GNU 
+General Public License or the Artistic License, as 
+specified in the Perl README file.
+
+No WARRANTY whatsoever.
