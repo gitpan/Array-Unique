@@ -1,8 +1,13 @@
 Revision history for Perl extension Array::Unique.
 
+0.06  2004 October 2
+      Fixing a bug dropping false values from the list such ase 0 and "" (Werner Weichselberger)
+      Adding more tests. 
+	  Using Module::Build 
+	  
 0.05  2003 October 11
 
-0.04  2002 December   - never released
+0.04  2002 December   - actually uploaded to CPAN on 2003.10.11 
       added use warnings to the released version as well.
       add tests with negative indexes and fix a minor problem
       with negative indexes in splice.
@@ -13,6 +18,9 @@ Revision history for Perl extension Array::Unique.
 
       Creat a new implementation from scratch that will replace all
       previous implementations. 
+
+      Added lots of new tests. Test coverage as reported by Devel::Cover
+      is 83.3%
 
 0.03  2002 July 27
       Nothing changed inside.

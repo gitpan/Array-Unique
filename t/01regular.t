@@ -2,10 +2,10 @@
 # For testing the regular array behaviour of the module.
 # Except that this version does NOT allow undef values in the array
 # so if you put a value at an index which would leave undefs in
-# between the bew value is appended to the end of the array
+# between the new value is appended to the end of the array
 
-# The tests should include only unique values so they whould work
-# anyway.
+# The tests in this file should include only unique values so they 
+# whould work even with a regular array (except of the undefs).
 
 # TODO:
 # this returns strange, (undefined ?) value
@@ -67,7 +67,7 @@ SKIP: {
 # create a simple array
 # ---------------------------------------------------
 @c=@a=qw(a b c d);
-is(@a, 4, 'length is really 4');
+is(@a, 4, 'length is really 5');
 is_deeply(\@a, [qw(a b c d)], 'Create an array with simple assignement of 4 elements');
 is_deeply(\@c, [qw(a b c d)], 'create array returns the same array');
 
@@ -214,3 +214,6 @@ my $b = @a = (qw(a b c d), qw(x y z));
 is($b, 7, 'pass scalar value of created array');
 
 }
+
+
+

@@ -5,22 +5,18 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
-# strips out any duplicate values (leaves in the firts occurance)
-# and removes all undef values.
+# Strips out any duplicate values (leaves the first occurrence
+# of every duplicated value and drops the later occurrences).
+# Removes all undef values.
 sub unique {
     my $self = shift; # self or class
-#    if (ref $_[0] eq 'Array::Unique') {
-#	$self = shift;
-#	print "#AU\n";
-#    }
-#    print "# @_\n";
-    
 
     my %seen;
-    my @unique = grep defined $_ && !$seen{$_}++ && $_, @_;
-    # based on the Cookbook and on suggestion by Jeff 'japhy' Pinyan
+    my @unique = grep defined $_ && !$seen{$_}++, @_;
+    # based on the Cookbook 1st edition and on suggestion by Jeff 'japhy' Pinyan
+	# fixed by  Werner Weichselberger
 }
 
 
@@ -80,7 +76,6 @@ sub SPLICE {
     my $offset = shift;
     my $length = shift;
 
-#=pod
     # reset length value to positive (this is done by the normal splice too)
     if (defined $length and $length < 0) {
 	#$length = @{$self->{array}} + $length;
@@ -91,7 +86,6 @@ sub SPLICE {
     if (defined $offset and $offset < 0) {
 	$offset += $self->FETCHSIZE;
     }
-#=cut
 
     if (defined $offset and
 	$offset > $self->FETCHSIZE) {
@@ -162,36 +156,38 @@ sub Splice {
 }
 
 1;
+
 __END__
+
 =pod
 
 =head1 NAME
 
-Array::Unique - Tieable array that allows only unique values
+Array::Unique - Tie-able array that allows only unique values
 
 =head1 SYNOPSIS
 
  use Array::Unique;
  tie @a, 'Array::Unique';
 
- Use @a as a regular array.
+ Now use @a as a regular array.
 
 =head1 DESCRIPTION
 
 This package lets you create an array which will allow
-only one occurence of any value.
+only one occurrence of any value.
 
 In other words no matter how many times you put in 42
-it will keep only the first occurance and the rest will
-be droped.
+it will keep only the first occurrence and the rest will
+be dropped.
 
 You use the module via tie and once you tied your array to
 this module it will behave correctly.
 
-Uniqueness is checeked with the 'eq' operator so 
+Uniqueness is checked with the 'eq' operator so 
 among other things it is case sensitive.
 
-The module does not allow undef as a value in the array.
+As a side effect the module does not allow undef as a value in the array.
 
 =head1 EXAMPLES
 
@@ -205,7 +201,7 @@ The module does not allow undef as a value in the array.
 =head1 DISCUSSION
 
  When you are collecting a list of items and you want 
- to make sure there is only one occurence of each item,
+ to make sure there is only one occurrence of each item,
  you have several option:
 
 
@@ -213,9 +209,20 @@ The module does not allow undef as a value in the array.
 
 =item 1) using an array and extracting the unique elements later
 
- There is good discussion about it in the Perl Cookbook of O'Reilly.
- I have copied the solutions here, you can see further discussion in the
- book.
+ You might use a regular array to hold this unique set of values
+ and either remove duplicates on each update by that keeping the array
+ always unique or remove duplicates just before you want to use the 
+ uniqueness feature of the array. In either case you might run a 
+ function you call @a = unique_value(@a);
+
+ The problem with this approach is that you have to implement 
+ the unique_value function (see later) AND you have to make sure you 
+ don't forget to call it. I would say don't rely on remembering this.
+ 
+
+ There is good discussion about it in the 1st edition of the 
+ Perl Cookbook of O'Reilly. I have copied the solutions here, 
+ you can see further discussion in the book.
 
  ----------------------------------------
  Extracting Unique Elements from a List (Section 4.6 in the Perl Cookbook 1st ed.)
@@ -251,9 +258,8 @@ The module does not allow undef as a value in the array.
 
  ----------------------------------------
 
- Anyway, all these solutions
 
-=item 1) using hash
+=item 2) using a hash
 
  Some people use the keys of a hash to keep the items and
  put an arbitrary value as the values of the hash:
@@ -265,8 +271,7 @@ The module does not allow undef as a value in the array.
  print join ", ", sort keys %unique;
 
  To add values to it:
- %unique = map { $_ => 1 }
-        (keys %unique, qw( one after the nine oh nine ));
+ $unique{$_}=1 foreach qw( one after the nine oh nine );
 
  To remove values:
  delete @unique{ qw(oh nine) };
@@ -274,7 +279,7 @@ The module does not allow undef as a value in the array.
  To check if a value is there:
  $unique{ $value };        # which is why I like to use "1" as my value
 
- (thanks to Gaal Yahas for the above explanation)
+ (thanks to Gaal Yahas for the above examples)
 
  There are three drawbacks I see:
  1) You type more.
@@ -285,22 +290,13 @@ The module does not allow undef as a value in the array.
  Usually non of them is critical but when I saw this the 10th time
  in a code I had to understand with 0 documentation I got frustrated.
 
-=item 2) using array
-
- Other people might use real arrays and on each update or
- before they want to use the uniqueness feature of the array
- they might run a function they call @a = unique_value(@);
-
- This is also good but you have to implement the unique_value
- function AND you have to make sure you don't forget to call it.
- Something I have a tendency to do just before code release.
 
 =item 3) using Array::Unique
 
  So I decided to write this module because I got frustrated
  by my lack of understanding what's going on in that code
  I mentioned.
- In addition I thought it can a good game to write this and
+ In addition I thought it might be interesting to write this and
  then benchmark it.
  Additionally it is nice to have your name displayed in 
  bright lights all over CPAN ... or at least in a module.
@@ -308,19 +304,51 @@ The module does not allow undef as a value in the array.
  Array::Unique lets you tie an array to hmmm, itself (?)
  and makes sure the values of the array are always unique.
 
+ Since writing this I am not sure if I really recommend its usage.
+ I would say stick with the hash version and document that the
+ variable is aggregating a unique list of values.
+
+
+=item 4) Using real SET
+
+There are modules on CPAN that let you create and maintain SETs.
+I have not checked any of those but I guess they just as much of
+an overkill for this functionality as Unique::Array.
+
+
 =back
 
 =head1 BUGS
 
- I think you cannot use two different implementations
- in the same script.
+ use Array::Unique;
+ tie @a, 'Array::Unique';
+
+ @c = @a = qw(a b c a d e f b);
+ 
+ @c will contain the same as @a AND two undefs at the end because
+ @c you get the same length as the right most list.
 
 =head1 TODO
+
+ Test:
+   Change size of the array
+   Elements with false values ('', '0', 0) 
+   splice:
+   splice @a;
+   splice @a,  3;
+   splice @a, -3;
+   splice @a,  3,  5;
+   splice @a,  3, -5;
+   splice @a, -3,  5;
+   splice @a, -3, -5;
+   splice @a,  ?,  ?, @b;
+
+
 
  Benchmark speed
 
  Add faster functions that don't check uniqueness so if I 
-   know part of the data that comes from a uniques source then
+   know part of the data that comes from a unique source then
    I can speed up the process,
    In short shoot myself in the leg.
 
@@ -330,10 +358,11 @@ The module does not allow undef as a value in the array.
 
 =head1 AUTHOR
 
- Gabor Szabo <gabor@perl.org.il>
+ Gabor Szabo <gabor@pti.co.il>
 
- Copyright (C) 2002-2003 Gabor Szabo <gabor@perl.org.il>
+ Copyright (C) 2002-2004 Gabor Szabo <gabor@pti.co.il>
  All rights reserved.
+ http://www.pti.co.il/
 
  You may distribute under the terms of either the GNU 
  General Public License or the Artistic License, as 
@@ -358,10 +387,13 @@ The module does not allow undef as a value in the array.
  Shlomo Yona
  Gaal Yahas
  Jeff 'japhy' Pinyan
+ Werner Weichselberger
 
 =head1 VERSION
 
- Version: 0.04
- Date:    2003.01.18
+ Version: 0.06
+ Date:    2004.10.02
 
 =cut
+
+

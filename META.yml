@@ -1,12 +1,14 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Array-Unique
-version:      0.04
-version_from: Unique.pm
-installdirs:  site
+--- #YAML:1.0
+name: Array-Unique
+version: 0.06
+author: Gabor Szabo <gabor@pti.co.il>
+abstract: Tie-able array that allows only unique values
+license: perl
 requires:
-    Test::More:                    0.47
-    Tie::IxHash:                   1.21
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.16
+  Test::More: 0.47
+  perl: 0.006
+provides:
+  Array::Unique:
+    file: lib/Array/Unique.pm
+    version: 0.06
+generated_by: Module::Build version 0.25_01
