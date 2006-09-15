@@ -3,9 +3,13 @@ Makefile.PL
 Build.PL
 MANIFEST
 README
+META.yml
+
 t/01regular.t
 t/02class.t
 t/03unique.t
 t/04false.t
+t/90pod.t
+t/91pod_coverage.t
+
 lib/Array/Unique.pm
-META.yml                                Module meta-data (added by MakeMaker)

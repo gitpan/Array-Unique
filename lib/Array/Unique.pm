@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Strips out any duplicate values (leaves the first occurrence
 # of every duplicated value and drops the later occurrences).
@@ -16,16 +16,16 @@ sub unique {
     my %seen;
     my @unique = grep defined $_ && !$seen{$_}++, @_;
     # based on the Cookbook 1st edition and on suggestion by Jeff 'japhy' Pinyan
-	# fixed by  Werner Weichselberger
+    # fixed by  Werner Weichselberger
 }
 
 
 sub TIEARRAY {
     my $class = shift;
     my $self = {
-		array => [],
-		hash => {},
-		};
+        array => [],
+        hash => {},
+        };
     bless $self, $class;
 }
 
@@ -64,7 +64,7 @@ sub STORESIZE {
 
     # But we can make it smaller
 #   if ($self->FETCHSIZE > $size) {
-#	$self->{->Splice($size);
+#   $self->{->_splice($size);
 #    }
 
     $#{$self->{array}} = $size-1;
@@ -78,31 +78,30 @@ sub SPLICE {
 
     # reset length value to positive (this is done by the normal splice too)
     if (defined $length and $length < 0) {
-	#$length = @{$self->{array}} + $length;
-	$length += $self->FETCHSIZE - $offset;
+    #$length = @{$self->{array}} + $length;
+    $length += $self->FETCHSIZE - $offset;
     }
 
     # reset offset to positive (this is done by the normal splice too)
     if (defined $offset and $offset < 0) {
-	$offset += $self->FETCHSIZE;
+    $offset += $self->FETCHSIZE;
     }
 
-    if (defined $offset and
-	$offset > $self->FETCHSIZE) {
-	$offset = $self->FETCHSIZE;
+    if (defined $offset and $offset > $self->FETCHSIZE) {
+        $offset = $self->FETCHSIZE;
         # should give a warning like this: splice() offset past end of array
-	# if this was really a splice (and warning set) but no warning if this
-	# was an assignment to a high index.
+        # if this was really a splice (and warning set) but no warning if this
+        # was an assignment to a high index.
     }
 
 #    my @s = @{$self->{array}}[$offset..$offset+$length]; # the old values to be returned
     my @original;
 #    if (defined $length) {
-	@original = $self->Splice($self->{array}, $offset, $length, @_);
+    @original = $self->_splice($self->{array}, $offset, $length, @_);
 #    } elsif (defined $offset) {
-#	@original = $self->Splice($self->{array}, $offset);
+#   @original = $self->_splice($self->{array}, $offset);
 #    } else {
-#	@original = $self->Splice($self->{array});
+#   @original = $self->_splice($self->{array});
 #    }
 
     return @original;
@@ -115,7 +114,7 @@ sub PUSH {
 
     $self->SPLICE($self->FETCHSIZE, 0, @_);
 #    while (my $value = shift) {
-#	$self->STORE($self->FETCHSIZE+1, $value);
+#   $self->STORE($self->FETCHSIZE+1, $value);
 #    }
     return $self->FETCHSIZE;
 }
@@ -137,7 +136,7 @@ sub UNSHIFT {
 }
 
 
-sub Splice {
+sub _splice {
     my $self = shift;
     my $a = shift;
     my $offset = shift;
@@ -145,11 +144,11 @@ sub Splice {
 
     my @original;
     if (defined $length) {
-	@original = splice(@$a, $offset, $length, @_);
+        @original = splice(@$a, $offset, $length, @_);
     } elsif (defined $offset) {
-	@original = splice(@$a, $offset);
+        @original = splice(@$a, $offset);
     } else {
-	@original = splice(@$a);
+        @original = splice(@$a);
     }
     @$a = $self->unique(@$a);
     return @original;
@@ -360,7 +359,7 @@ an overkill for this functionality as Unique::Array.
 
  Gabor Szabo <gabor@pti.co.il>
 
- Copyright (C) 2002-2004 Gabor Szabo <gabor@pti.co.il>
+ Copyright (C) 2002-2006 Gabor Szabo <gabor@pti.co.il>
  All rights reserved.
  http://www.pti.co.il/
 
