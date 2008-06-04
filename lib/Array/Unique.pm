@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Strips out any duplicate values (leaves the first occurrence
 # of every duplicated value and drops the later occurrences).
@@ -154,12 +154,6 @@ sub _splice {
     return @original;
 }
 
-1;
-
-__END__
-
-=pod
-
 =head1 NAME
 
 Array::Unique - Tie-able array that allows only unique values
@@ -199,34 +193,33 @@ As a side effect the module does not allow undef as a value in the array.
 
 =head1 DISCUSSION
 
- When you are collecting a list of items and you want 
- to make sure there is only one occurrence of each item,
- you have several option:
+When you are collecting a list of items and you want 
+to make sure there is only one occurrence of each item,
+you have several option:
 
 
 =over 4
 
 =item 1) using an array and extracting the unique elements later
 
- You might use a regular array to hold this unique set of values
- and either remove duplicates on each update by that keeping the array
- always unique or remove duplicates just before you want to use the 
- uniqueness feature of the array. In either case you might run a 
- function you call @a = unique_value(@a);
+You might use a regular array to hold this unique set of values
+and either remove duplicates on each update by that keeping the array
+always unique or remove duplicates just before you want to use the 
+uniqueness feature of the array. In either case you might run a 
+function you call @a = unique_value(@a);
 
- The problem with this approach is that you have to implement 
- the unique_value function (see later) AND you have to make sure you 
- don't forget to call it. I would say don't rely on remembering this.
+The problem with this approach is that you have to implement 
+the unique_value function (see later) AND you have to make sure you 
+don't forget to call it. I would say don't rely on remembering this.
  
 
- There is good discussion about it in the 1st edition of the 
- Perl Cookbook of O'Reilly. I have copied the solutions here, 
- you can see further discussion in the book.
+There is good discussion about it in the 1st edition of the 
+Perl Cookbook of O'Reilly. I have copied the solutions here, 
+you can see further discussion in the book.
 
- ----------------------------------------
- Extracting Unique Elements from a List (Section 4.6 in the Perl Cookbook 1st ed.)
+Extracting Unique Elements from a List (Section 4.6 in the Perl Cookbook 1st ed.)
 
- # Straightforward
+# Straightforward
 
  %seen = ();
  @uniq = ();
@@ -238,13 +231,15 @@ As a side effect the module does not allow undef as a value in the array.
     }
  } 
 
- # Faster
+# Faster
+
  %seen = ();
  foreach $item (@list) {
    push(@uniq, $item) unless $seen{$item}++;
  }
 
- # Faster but different
+# Faster but different
+
  %seen;
  foreach $item (@list) {
    $seen{$item}++;
@@ -255,57 +250,69 @@ As a side effect the module does not allow undef as a value in the array.
  %seen;
  @uniq = grep {! $seen{$_}++} @list;
 
- ----------------------------------------
-
 
 =item 2) using a hash
 
- Some people use the keys of a hash to keep the items and
- put an arbitrary value as the values of the hash:
+Some people use the keys of a hash to keep the items and
+put an arbitrary value as the values of the hash:
 
- To build such a list:
+To build such a list:
+
  %unique = map { $_ => 1 } qw( one two one two three four! );
 
- To print it:
+To print it:
+
  print join ", ", sort keys %unique;
 
- To add values to it:
+To add values to it:
+
  $unique{$_}=1 foreach qw( one after the nine oh nine );
 
- To remove values:
+To remove values:
+
  delete @unique{ qw(oh nine) };
 
- To check if a value is there:
+To check if a value is there:
+
  $unique{ $value };        # which is why I like to use "1" as my value
 
- (thanks to Gaal Yahas for the above examples)
+(thanks to Gaal Yahas for the above examples)
 
- There are three drawbacks I see:
- 1) You type more.
- 2) Your reader might not understand at first why did you use hash 
+There are three drawbacks I see:
+
+=over 4
+
+=item 1) You type more.
+
+=item 2) Your reader might not understand at first why did you use hash 
     and what will be the values.
- 3) You lose the order.
 
- Usually non of them is critical but when I saw this the 10th time
- in a code I had to understand with 0 documentation I got frustrated.
+=item 3) You lose the order.
+
+=back
+
+Usually non of them is critical but when I saw this the 10th time
+in a code I had to understand with 0 documentation I got frustrated.
 
 
 =item 3) using Array::Unique
 
- So I decided to write this module because I got frustrated
- by my lack of understanding what's going on in that code
- I mentioned.
- In addition I thought it might be interesting to write this and
- then benchmark it.
- Additionally it is nice to have your name displayed in 
- bright lights all over CPAN ... or at least in a module.
+So I decided to write this module because I got frustrated
+by my lack of understanding what's going on in that code
+I mentioned.
 
- Array::Unique lets you tie an array to hmmm, itself (?)
- and makes sure the values of the array are always unique.
+In addition I thought it might be interesting to write this and
+then benchmark it.
 
- Since writing this I am not sure if I really recommend its usage.
- I would say stick with the hash version and document that the
- variable is aggregating a unique list of values.
+Additionally it is nice to have your name displayed in 
+bright lights all over CPAN ... or at least in a module.
+
+Array::Unique lets you tie an array to hmmm, itself (?)
+and makes sure the values of the array are always unique.
+
+Since writing this I am not sure if I really recommend its usage.
+I would say stick with the hash version and document that the
+variable is aggregating a unique list of values.
 
 
 =item 4) Using real SET
@@ -329,9 +336,11 @@ an overkill for this functionality as Unique::Array.
 
 =head1 TODO
 
- Test:
-   Change size of the array
-   Elements with false values ('', '0', 0) 
+Test:
+
+Change size of the array
+Elements with false values ('', '0', 0) 
+
    splice:
    splice @a;
    splice @a,  3;
@@ -344,40 +353,31 @@ an overkill for this functionality as Unique::Array.
 
 
 
- Benchmark speed
+Benchmark speed
 
- Add faster functions that don't check uniqueness so if I 
-   know part of the data that comes from a unique source then
-   I can speed up the process,
-   In short shoot myself in the leg.
+Add faster functions that don't check uniqueness so if I 
+know part of the data that comes from a unique source then
+I can speed up the process,
+In short shoot myself in the leg.
 
- Enable optional compare with other functions
+Enable optional compare with other functions
 
- Write even better implementations.
+Write even better implementations.
 
 =head1 AUTHOR
 
- Gabor Szabo <gabor@pti.co.il>
+Gabor Szabo <gabor@pti.co.il>
 
- Copyright (C) 2002-2006 Gabor Szabo <gabor@pti.co.il>
- All rights reserved.
- http://www.pti.co.il/
+=head1 LICENSE
 
- You may distribute under the terms of either the GNU 
- General Public License or the Artistic License, as 
- specified in the Perl README file.
+Copyright (C) 2002-2008 Gabor Szabo <gabor@pti.co.il>
+All rights reserved.  http://www.pti.co.il/
 
- No WARRANTY whatsoever.
+You may distribute under the terms of either the GNU 
+General Public License or the Artistic License, as 
+specified in the Perl README file.
 
-=head1 SUPPORT
-
- There is no official support for this package but
- you can send bug reports directly to the author.
-
- To get other support answers you should use either
- the Hungarian Perl mailing list at http://www.perl.org.hu/
- if you want to ask in Hungarian or the Israeli Perl 
- mailing list at http://www.perl.org.il/ in English.
+No WARRANTY whatsoever.
 
 =head1 CREDITS
 
@@ -390,9 +390,11 @@ an overkill for this functionality as Unique::Array.
 
 =head1 VERSION
 
- Version: 0.06
- Date:    2004.10.02
+Version: 0.08
+
+Date:    2008 June 04
 
 =cut
 
+1;
 

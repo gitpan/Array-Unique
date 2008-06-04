@@ -1,5 +1,12 @@
 Revision history for Perl extension Array::Unique.
 
+0.08 2008 June 4
+
+    Mostly CPANTS gaming
+    Change pod header to include =LICENSE
+    Some docs cleanup
+    Include authors tests in xt/
+
 0.07  2006 September 15
     Add pod tests 
     Add missing META.yml file

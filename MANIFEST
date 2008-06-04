@@ -9,7 +9,9 @@ t/01regular.t
 t/02class.t
 t/03unique.t
 t/04false.t
-t/90pod.t
-t/91pod_coverage.t
 
 lib/Array/Unique.pm
+
+xt/critic.t
+xt/pod-coverage.t
+xt/pod.t

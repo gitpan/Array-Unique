@@ -2,12 +2,13 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'Array::Unique',
           'VERSION_FROM' => 'lib/Array/Unique.pm',
           'PREREQ_PM' => {
                            'Test::More' => '0.47'
-                         }
+                         },
+          'INSTALLDIRS' => 'site',
+          'EXE_FILES' => [],
+          'PL_FILES' => {}
         )
 ;
